@@ -1,0 +1,13 @@
+apiVersion: v2
+name: prometheus-speedtest-exporter
+description: A Helm chart for deploying MiguelNdeCarvalho/speedtest-exporter
+type: application
+version: "3.5.4"
+appVersion: "3.5.4"
+keywords:
+  - prometheus
+  - monitoring
+  - speedtest
+maintainers:
+  - name: jpflouret
+    email: jpflouret@gmail.com
