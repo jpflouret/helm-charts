@@ -1,0 +1,70 @@
+stages:
+  - build
+  - deploy
+
+helm-build:
+  stage: build
+  needs: []
+  image:
+    name: alpine/helm:3.14.1
+    entrypoint: [""]
+  variables:
+    CHART: prometheus-speedtest-exporter
+  script:
+    - helm dependency update charts/${CHART}
+    - helm package charts/${CHART}
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - ${CHART}*.tgz
+  rules:
+    - changes:
+      - charts/*
+
+helm-deploy-gitlab:
+  stage: deploy
+  needs: ["helm-build"]
+  image:
+    name: alpine/helm:3.14.1
+    entrypoint: [""]
+  dependencies:
+    - helm-build
+  variables:
+    CHART: prometheus-speedtest-exporter
+  before_script:
+    - apk add git
+    - helm plugin install https://github.com/chartmuseum/helm-push --version=v0.10.4
+    - helm repo add gitlab-repo --username ${CI_REGISTRY_USER} --password ${CI_REGISTRY_PASSWORD} ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/stable
+  script:
+    - helm cm-push --force ${CHART}*.tgz gitlab-repo
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
+      allow_failure: false
+    - when: manual
+      allow_failure: true
+      changes:
+      - charts/*
+
+helm-deploy-s3:
+  stage: deploy
+  needs: ["helm-build"]
+  image:
+    name: alpine/helm:3.14.1
+    entrypoint: [""]
+  dependencies:
+    - helm-build
+  variables:
+    CHART: prometheus-speedtest-exporter
+  before_script:
+    - apk add git
+    - helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.16.0
+    - helm repo add s3-repo ${S3_BUCKET}
+  script:
+    - helm s3 push --force ${CHART}*.tgz s3-repo
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
+      allow_failure: false
+    - when: manual
+      allow_failure: true
+      changes:
+      - charts/*
