@@ -1,0 +1,13 @@
+apiVersion: v2
+name: prometheus-nut-exporter
+description: A Helm chart for deploying HON95/prometheus-nut-exporter
+type: application
+version: "1.2.1"
+appVersion: "1.2.1"
+keywords:
+  - prometheus
+  - monitoring
+  - network-ups-tools
+maintainers:
+  - name: jpflouret
+    email: jpflouret@gmail.com
