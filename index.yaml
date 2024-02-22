@@ -1,0 +1,21 @@
+apiVersion: v1
+entries:
+  prometheus-speedtest-exporter:
+  - apiVersion: v2
+    appVersion: 3.5.4
+    created: "2024-02-22T04:08:13.862535023Z"
+    description: A Helm chart for deploying MiguelNdeCarvalho/speedtest-exporter
+    digest: b6fa266a7ab59864f475535a579ebcade2a3c4512524d9ee43df109af85d1aa0
+    keywords:
+    - prometheus
+    - monitoring
+    - speedtest
+    maintainers:
+    - email: jpflouret@gmail.com
+      name: jpflouret
+    name: prometheus-speedtest-exporter
+    type: application
+    urls:
+    - https://github.com/jpflouret/helm-charts/releases/download/prometheus-speedtest-exporter-3.5.4/prometheus-speedtest-exporter-3.5.4.tgz
+    version: 3.5.4
+generated: "2024-02-22T04:08:13.862540934Z"
