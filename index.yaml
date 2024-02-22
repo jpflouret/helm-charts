@@ -1,5 +1,23 @@
 apiVersion: v1
 entries:
+  prometheus-nut-exporter:
+  - apiVersion: v2
+    appVersion: 1.2.1
+    created: "2024-02-22T07:35:58.766367574Z"
+    description: A Helm chart for deploying HON95/prometheus-nut-exporter
+    digest: dfb1ac6e55951d81e0a916085fdd4c3c8384ae5b2840242b891c6c48d4ccee17
+    keywords:
+    - prometheus
+    - monitoring
+    - network-ups-tools
+    maintainers:
+    - email: jpflouret@gmail.com
+      name: jpflouret
+    name: prometheus-nut-exporter
+    type: application
+    urls:
+    - https://github.com/jpflouret/helm-charts/releases/download/prometheus-nut-exporter-1.2.1/prometheus-nut-exporter-1.2.1.tgz
+    version: 1.2.1
   prometheus-speedtest-exporter:
   - apiVersion: v2
     appVersion: 3.5.4
@@ -18,4 +36,4 @@ entries:
     urls:
     - https://github.com/jpflouret/helm-charts/releases/download/prometheus-speedtest-exporter-3.5.4/prometheus-speedtest-exporter-3.5.4.tgz
     version: 3.5.4
-generated: "2024-02-22T04:08:13.862540934Z"
+generated: "2024-02-22T07:35:58.766372434Z"
