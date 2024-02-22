@@ -2,14 +2,10 @@ stages:
   - build
   - deploy
 
-helm-build:
-  stage: build
-  needs: []
+.build_job: &build_job
   image:
     name: alpine/helm:3.14.1
     entrypoint: [""]
-  variables:
-    CHART: prometheus-speedtest-exporter
   script:
     - helm dependency update charts/${CHART}
     - helm package charts/${CHART}
@@ -19,18 +15,12 @@ helm-build:
       - ${CHART}*.tgz
   rules:
     - changes:
-      - charts/*
+      - charts/${CHART}/*
 
-helm-deploy-gitlab:
-  stage: deploy
-  needs: ["helm-build"]
+.deploy_gitlab_job: &deploy_gitlab_job
   image:
     name: alpine/helm:3.14.1
     entrypoint: [""]
-  dependencies:
-    - helm-build
-  variables:
-    CHART: prometheus-speedtest-exporter
   before_script:
     - apk add git
     - helm plugin install https://github.com/chartmuseum/helm-push --version=v0.10.4
@@ -38,23 +28,15 @@ helm-deploy-gitlab:
   script:
     - helm cm-push --force ${CHART}*.tgz gitlab-repo
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
-      allow_failure: false
     - when: manual
       allow_failure: true
       changes:
-      - charts/*
+      - charts/${CHART}/*
 
-helm-deploy-s3:
-  stage: deploy
-  needs: ["helm-build"]
+.deploy_s3_job: &deploy_s3_job
   image:
     name: alpine/helm:3.14.1
     entrypoint: [""]
-  dependencies:
-    - helm-build
-  variables:
-    CHART: prometheus-speedtest-exporter
   before_script:
     - apk add git
     - helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.16.0
@@ -62,9 +44,34 @@ helm-deploy-s3:
   script:
     - helm s3 push --relative --force ${CHART}*.tgz s3-repo
   rules:
-    - if: $CI_COMMIT_TAG =~ /^v\d+.\d+.\d+/
-      allow_failure: false
     - when: manual
       allow_failure: true
       changes:
-      - charts/*
+      - charts/${CHART}/*
+
+helm-build-speedtest:
+  needs: []
+  stage: build
+  variables:
+    CHART: prometheus-speedtest-exporter
+  <<: *build_job
+
+helm-deploy-speedtest-gitlab:
+  stage: deploy
+  needs: ["helm-build-speedtest"]
+  dependencies:
+    - helm-build-speedtest
+  variables:
+    CHART: prometheus-speedtest-exporter
+    CHART_TAG_PATTERN: /^${CHART}-v\d+.\d+.\d+/
+  <<: *deploy_gitlab_job
+  
+helm-deploy-speedtest-s3:
+  stage: deploy
+  needs: ["helm-build-speedtest"]
+  dependencies:
+    - helm-build-speedtest
+  variables:
+    CHART: prometheus-speedtest-exporter
+    CHART_TAG_PATTERN: /^${CHART}-v\d+.\d+.\d+/
+  <<: *deploy_s3_job
